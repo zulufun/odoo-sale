@@ -1,1 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_custom_sale_order_user,custom.sale.order.user,model_custom_sale_order,group_custom_sale_user,1,1,1,0
+access_custom_sale_order_manager,custom.sale.order.manager,model_custom_sale_order,group_custom_sale_manager,1,1,1,1
+access_custom_sale_order_line_user,custom.sale.order.line.user,model_custom_sale_order_line,group_custom_sale_user,1,1,1,0
+access_custom_sale_order_line_manager,custom.sale.order.line.manager,model_custom_sale_order_line,group_custom_sale_manager,1,1,1,1
+access_custom_sale_report_user,custom.sale.report.user,model_custom_sale_report,group_custom_sale_user,1,0,0,0
+access_custom_sale_report_manager,custom.sale.report.manager,model_custom_sale_report,group_custom_sale_manager,1,0,0,0

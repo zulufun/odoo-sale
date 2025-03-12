@@ -1,56 +1,258 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Kế thừa view form đơn hàng -->
-    <record id="view_order_form_inherit" model="ir.ui.view">
-        <field name="name">sale.order.form.inherit</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <!-- Thêm trường vào header -->
-            <field name="date_order" position="after">
-                <field name="custom_reference" placeholder="Mã tham chiếu tùy chỉnh"/>
-                <field name="priority" widget="priority"/>
+    <data>
+        <!-- Sale Order Search View -->
+        <record id="view_custom_sale_order_search" model="ir.ui.view">
+            <field name="name">custom.sale.order.search</field>
+            <field name="model">custom.sale.order</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm đơn hàng">
+                    <field name="name" string="Đơn hàng"/>
+                    <field name="partner_id"/>
+                    <field name="user_id"/>
+                    <filter string="Của tôi" name="my_orders" domain="[('user_id', '=', uid)]"/>
+                    <filter string="Bản thảo" name="draft" domain="[('state', '=', 'draft')]"/>
+                    <filter string="Đã xác nhận" name="sales" domain="[('state', 'in', ['sale', 'done'])]"/>
+                    <group expand="0" string="Nhóm theo">
+                        <filter string="Khách hàng" name="customer" context="{'group_by': 'partner_id'}"/>
+                        <filter string="Nhân viên bán hàng" name="salesperson" context="{'group_by': 'user_id'}"/>
+                        <filter string="Trạng thái" name="status" context="{'group_by': 'state'}"/>
+                        <filter string="Ngày đặt hàng" name="order_date" context="{'group_by': 'date_order:month'}"/>
+                    </group>
+                </search>
             </field>
-            
-            <!-- Thêm tab mới -->
-            <xpath expr="//notebook" position="inside">
-                <page string="Thông tin thêm">
+        </record>
+
+        <!-- Sale Order Tree View -->
+        <record id="view_custom_sale_order_tree" model="ir.ui.view">
+            <field name="name">custom.sale.order.tree</field>
+            <field name="model">custom.sale.order</field>
+            <field name="arch" type="xml">
+                <tree string="Đơn hàng bán" decoration-bf="message_needaction==True" decoration-muted="state=='cancel'">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="date_order"/>
+                    <field name="user_id"/>
+                    <field name="amount_total" sum="Tổng tiền" widget="monetary"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="state"/>
+                    <field name="message_needaction" invisible="1"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Sale Order Form View -->
+        <record id="view_custom_sale_order_form" model="ir.ui.view">
+            <field name="name">custom.sale.order.form</field>
+            <field name="model">custom.sale.order</field>
+            <field name="arch" type="xml">
+                <form string="Đơn hàng bán">
+                    <header>
+                        <button name="action_confirm" string="Xác nhận" type="object" class="btn-primary" states="draft"/>
+                        <button name="action_cancel" string="Hủy bỏ" type="object" states="draft,sent,sale"/>
+                        <button name="action_draft" string="Phục hồi" type="object" states="cancel"/>
+                        <button name="action_done" string="Hoàn thành" type="object" states="sale"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale,done"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id"/>
+                                <field name="user_id"/>
+                            </group>
+                            <group>
+                                <field name="date_order"/>
+                                <field name="company_id" groups="base.group_multi_company"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Chi tiết đơn hàng">
+                                <field name="order_line">
+                                    <tree string="Chi tiết đơn hàng" editable="bottom">
+                                        <field name="product_id"/>
+                                        <field name="name"/>
+                                        <field name="product_uom_qty"/>
+                                        <field name="product_uom"/>
+                                        <field name="price_unit"/>
+                                        <field name="discount"/>
+                                        <field name="tax_id" widget="many2many_tags"/>
+                                        <field name="price_subtotal" sum="Thành tiền"/>
+                                    </tree>
+                                </field>
+                                <group class="oe_subtotal_footer oe_right">
+                                    <field name="amount_untaxed" widget="monetary"/>
+                                    <field name="amount_tax" widget="monetary"/>
+                                    <div class="oe_subtotal_footer_separator oe_inline">
+                                        <label for="amount_total"/>
+                                    </div>
+                                    <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                                </group>
+                                <div class="oe_clear"/>
+                            </page>
+                            <page string="Ghi chú khác">
+                                <field name="note"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Sale Order Calendar View -->
+        <record id="view_custom_sale_order_calendar" model="ir.ui.view">
+            <field name="name">custom.sale.order.calendar</field>
+            <field name="model">custom.sale.order</field>
+            <field name="arch" type="xml">
+                <calendar string="Đơn hàng bán" date_start="date_order" color="state">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="amount_total"/>
+                </calendar>
+            </field>
+        </record>
+
+        <!-- Sale Order Line Form View -->
+        <record id="view_custom_sale_order_line_form" model="ir.ui.view">
+            <field name="name">custom.sale.order.line.form</field>
+            <field name="model">custom.sale.order.line</field>
+            <field name="arch" type="xml">
+                <form string="Chi tiết đơn hàng">
                     <group>
                         <group>
-                            <field name="expected_delivery_date"/>
-                            <field name="total_weight" widget="float" digits="[14,2]"/>
+                            <field name="order_id"/>
+                            <field name="product_id"/>
+                            <field name="name"/>
                         </group>
                         <group>
-                            <field name="customer_notes" placeholder="Ghi chú từ khách hàng..."/>
+                            <field name="product_uom_qty"/>
+                            <field name="product_uom"/>
+                            <field name="price_unit"/>
+                            <field name="discount"/>
+                            <field name="tax_id" widget="many2many_tags"/>
                         </group>
                     </group>
-                </page>
-            </xpath>
-            
-            <!-- Thêm trường vào dòng đơn hàng -->
-            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
-                <field name="is_discount_item"/>
-            </xpath>
-            
-            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
-                <field name="is_discount_item"/>
-                <field name="line_notes" placeholder="Ghi chú cho dòng sản phẩm này..."/>
-            </xpath>
-        </field>
-    </record>
-    
-    <!-- Thêm filter và groupby vào search view -->
-    <record id="view_sales_order_filter_inherit" model="ir.ui.view">
-        <field name="name">sale.order.list.select.inherit</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-        <field name="arch" type="xml">
-            <filter name="my_sale_orders_filter" position="after">
-                <filter string="Ưu tiên cao" name="high_priority" domain="[('priority', '=', '2')]"/>
-            </filter>
-            <filter name="salesperson" position="after">
-                <filter string="Mức độ ưu tiên" name="priority" context="{'group_by': 'priority'}"/>
-            </filter>
-        </field>
-    </record>
+                </form>
+            </field>
+        </record>
+
+        <!-- Sale Order Action -->
+        <record id="action_custom_sale_orders" model="ir.actions.act_window">
+            <field name="name">Đơn hàng bán</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">custom.sale.order</field>
+            <field name="view_mode">tree,form,calendar</field>
+            <field name="search_view_id" ref="view_custom_sale_order_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Tạo đơn hàng bán đầu tiên của bạn
+                </p>
+            </field>
+        </record>
+
+        <!-- Sale Report View -->
+        <record id="view_custom_sale_report_search" model="ir.ui.view">
+            <field name="name">custom.sale.report.search</field>
+            <field name="model">custom.sale.report</field>
+            <field name="arch" type="xml">
+                <search string="Tìm kiếm báo cáo bán hàng">
+                    <field name="date"/>
+                    <field name="product_id"/>
+                    <field name="partner_id"/>
+                    <filter string="Đơn hàng đã xác nhận" name="confirmed_orders" domain="[('state', 'in', ['sale', 'done'])]"/>
+                    <group expand="1" string="Nhóm theo">
+                        <filter string="Khách hàng" name="customer" context="{'group_by':'partner_id'}"/>
+                        <filter string="Nhân viên" name="salesperson" context="{'group_by':'user_id'}"/>
+                        <filter string="Sản phẩm" name="product" context="{'group_by':'product_id'}"/>
+                        <filter string="Trạng thái" name="status" context="{'group_by':'state'}"/>
+                        <filter string="Công ty" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                        <filter string="Ngày" name="date" context="{'group_by':'date:day'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_custom_sale_report_graph" model="ir.ui.view">
+            <field name="name">custom.sale.report.graph</field>
+            <field name="model">custom.sale.report</field>
+            <field name="arch" type="xml">
+                <graph string="Báo cáo bán hàng" type="bar">
+                    <field name="partner_id"/>
+                    <field name="price_total" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_custom_sale_report_pivot" model="ir.ui.view">
+            <field name="name">custom.sale.report.pivot</field>
+            <field name="model">custom.sale.report</field>
+            <field name="arch" type="xml">
+                <pivot string="Báo cáo bán hàng" disable_linking="True">
+                    <field name="partner_id" type="row"/>
+                    <field name="date" type="col"/>
+                    <field name="price_total" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="action_custom_sale_report" model="ir.actions.act_window">
+            <field name="name">Báo cáo bán hàng</field>
+            <field name="res_model">custom.sale.report</field>
+            <field name="view_mode">graph,pivot</field>
+            <field name="search_view_id" ref="view_custom_sale_report_search"/>
+            <field name="context">{'search_default_confirmed_orders': 1}</field>
+        </record>
+
+        <!-- Menu Items -->
+        <menuitem id="menu_custom_sale_root" name="Bán hàng" sequence="20"/>
+        <menuitem id="menu_custom_sale" name="Bán hàng" parent="menu_custom_sale_root" sequence="10"/>
+        <menuitem id="menu_custom_sale_order" name="Đơn hàng" parent="menu_custom_sale" action="action_custom_sale_orders" sequence="10"/>
+        <menuitem id="menu_custom_sale_report" name="Báo cáo" parent="menu_custom_sale_root" sequence="20"/>
+        <menuitem id="menu_custom_sale_report_item" name="Báo cáo bán hàng" parent="menu_custom_sale_report" action="action_custom_sale_report" sequence="10"/>
+    </data>
+</odoo>
+
+# File: security/sales_security.xml
+<odoo>
+    <data>
+        <record id="module_custom_sale_category" model="ir.module.category">
+            <field name="name">Bán hàng</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="group_custom_sale_user" model="res.groups">
+            <field name="name">Người dùng</field>
+            <field name="category_id" ref="module_custom_sale_category"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_custom_sale_manager" model="res.groups">
+            <field name="name">Quản lý</field>
+            <field name="category_id" ref="module_custom_sale_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_custom_sale_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="custom_sale_order_personal_rule" model="ir.rule">
+            <field name="name">Người dùng chỉ thấy đơn hàng của họ</field>
+            <field name="model_id" ref="model_custom_sale_order"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('group_custom_sale_user'))]"/>
+        </record>
+
+        <record id="custom_sale_order_manager_rule" model="ir.rule">
+            <field name="name">Quản lý thấy tất cả đơn hàng</field>
+            <field name="model_id" ref="model_custom_sale_order"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups" eval="[(4, ref('group_custom_sale_manager'))]"/>
+        </record>
+    </data>
 </odoo>
