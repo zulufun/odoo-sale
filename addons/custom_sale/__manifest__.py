@@ -1,26 +1,18 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 {
     'name': 'Custom Sales Inventory View',
     'version': '1.0',
-    'category': 'Sales/Sales',
-    'summary': 'Custom view for inventory products in sales',
-    'description': """
-This module extends the Sales application to allow viewing products in inventory.
-    """,
-    'depends': [
-        'sale',
-        'stock',
-    ],
-    'data': [
-        'security/ir.model.access.csv',
-        'views/product_inventory_views.xml',
-        'views/custom_sale_menus.xml',
-    ],
-    'demo': [],
-    'installable': True,
-    'application': False,
-    'auto_install': False,
+    'summary': 'View products in inventory',
+    'description': 'Hiển thị sản phẩm có trong kho hàng',
+    'category': 'Sales',
+    'author': 'Nguyên',
     'license': 'LGPL-3',
+    'website': 'https://www.odoo.com',
+    'depends': ['base', 'sale', 'stock'],
+    'data': [
+        'views/product_inventory_views.xml',
+        'security/ir.model.access.csv'
+    ],
+    'installable': True,
+    'application': True,
+    'auto_install': False,
 }
