@@ -1,0 +1,48 @@
+<odoo>
+    <!-- Action for Employees -->
+    <record id="action_employee_list" model="ir.actions.act_window">
+        <field name="name">Employees</field>
+        <field name="res_model">hr.employee</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- List View for Employees -->
+    <record id="view_employee_list" model="ir.ui.view">
+        <field name="name">employee.list</field>
+        <field name="model">hr.employee</field>
+        <field name="type">list</field>
+        <field name="arch" type="xml">
+            <list string="Employees">
+                <field name="name"/>
+                <field name="job_id"/>
+                <field name="work_phone"/>
+                <field name="work_email"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Employees -->
+    <record id="view_employee_form" model="ir.ui.view">
+        <field name="name">employee.form</field>
+        <field name="model">hr.employee</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Employee">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="job_id"/>
+                        <field name="work_phone"/>
+                        <field name="work_email"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Menu Item for Employee Manager -->
+    <menuitem id="employee_manager_menu" name="Employee Manager" sequence="10"/>
+    
+    <!-- Submenu for Employees -->
+    <menuitem id="employee_submenu" name="Employees" parent="employee_manager_menu" action="action_employee_list"/>
+</odoo>
