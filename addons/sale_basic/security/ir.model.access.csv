@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_simple_sale_order_user,simple.sale.order.user,model_simple_sale_order,group_simple_sale_user,1,1,1,0
+access_simple_sale_order_line_user,simple.sale.order.line.user,model_simple_sale_order_line,group_simple_sale_user,1,1,1,0
+access_simple_sale_order_manager,simple.sale.order.manager,model_simple_sale_order,group_simple_sale_manager,1,1,1,1
+access_simple_sale_order_line_manager,simple.sale.order.line.manager,model_simple_sale_order_line,group_simple_sale_manager,1,1,1,1

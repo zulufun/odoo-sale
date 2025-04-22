@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_calendar_event_form_inherit_avoid_holidays" model="ir.ui.view">
+        <field name="name">calendar.event.form.inherit.avoid.holidays</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_form"/>
+        <field name="arch" type="xml">
+            <field name="start" position="after">
+                <field name="is_holiday" readonly="1"/>
+                <button name="action_suggest_date" string="Đề xuất ngày không phải ngày lễ" type="object"
+                        invisible="is_holiday == False"/>
+            </field>
+        </field>
+    </record>
+    <record id="view_calendar_event_search_inherit_avoid_holidays" model="ir.ui.view">
+        <field name="name">calendar.event.search.inherit.avoid.holidays</field>
+        <field name="model">calendar.event</field>
+        <field name="inherit_id" ref="calendar.view_calendar_event_search"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="is_holiday"/>
+            </field>
+            <xpath expr="//search/group" position="inside">
+                <filter string="Sự kiện ngày lễ" name="holiday_events" domain="[('is_holiday', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

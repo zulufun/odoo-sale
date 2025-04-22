@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Main menu -->
+    <menuitem id="menu_simple_sale_root"
+        name="Bán hàng"
+        sequence="10"/>
+
+    <!-- Orders -->
+    <menuitem id="menu_simple_sale_order"
+        name="Đơn hàng"
+        parent="menu_simple_sale_root"
+        action="action_simple_sale_order"
+        sequence="10"/>
+</odoo>

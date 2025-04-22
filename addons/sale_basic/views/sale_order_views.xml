@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Form view -->
+    <record id="view_simple_sale_order_form" model="ir.ui.view">
+        <field name="name">simple.sale.order.form</field>
+        <field name="model">simple.sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Đơn hàng">
+                <header>
+                    <button name="action_confirm" string="Xác nhận" type="object" class="oe_highlight" states="draft,sent"/>
+                    <button name="action_quotation_send" string="Gửi báo giá" type="object" states="draft"/>
+                    <button name="action_done" string="Hoàn thành" type="object" states="sale"/>
+                    <button name="action_cancel" string="Hủy" type="object" states="draft,sent,sale"/>
+                    <button name="action_draft" string="Đặt về nháp" type="object" states="cancel"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,sale,done"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="date_order"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="company_id" invisible="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Chi tiết đơn hàng">
+                            <field name="order_line">
+                                <tree string="Chi tiết đơn hàng" editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="name"/>
+                                    <field name="product_uom_qty"/>
+                                    <field name="product_uom"/>
+                                    <field name="price_unit"/>
+                                    <field name="discount"/>
+                                    <field name="tax_id" widget="many2many_tags"/>
+                                    <field name="price_subtotal"/>
+                                </tree>
+                            </field>
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_untaxed" widget="monetary"/>
+                                <field name="amount_tax" widget="monetary"/>
+                                <div class="oe_subtotal_footer_separator oe_inline">
+                                    <label for="amount_total"/>
+                                </div>
+                                <field name="amount_total" nolabel="1" class="oe_subtotal_footer_separator" widget="monetary"/>
+                            </group>
+                            <div class="oe_clear"/>
+                        </page>
+                        <page string="Ghi chú">
+                            <field name="note"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Tree view -->
+    <record id="view_simple_sale_order_tree" model="ir.ui.view">
+        <field name="name">simple.sale.order.tree</field>
+        <field name="model">simple.sale.order</field>
+        <field name="arch" type="xml">
+            <tree string="Đơn hàng" decoration-info="state=='draft'" decoration-muted="state=='cancel'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date_order"/>
+                <field name="user_id"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="state"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Search view -->
+    <record id="view_simple_sale_order_search" model="ir.ui.view">
+        <field name="name">simple.sale.order.search</field>
+        <field name="model">simple.sale.order</field>
+        <field name="arch" type="xml">
+            <search string="Tìm kiếm đơn hàng">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+                <filter string="Báo giá" name="draft" domain="[('state','=','draft')]"/>
+                <filter string="Đã gửi báo giá" name="sent" domain="[('state','=','sent')]"/>
+                <filter string="Đơn hàng" name="sale" domain="[('state','=','sale')]"/>
+                <filter string="Hoàn thành" name="done" domain="[('state','=','done')]"/>
+                <filter string="Hủy" name="cancel" domain="[('state','=','cancel')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Khách hàng" name="customer" context="{'group_by':'partner_id'}"/>
+                    <filter string="Nhân viên" name="salesperson" context="{'group_by':'user_id'}"/>
+                    <filter string="Trạng thái" name="status" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_simple_sale_order" model="ir.actions.act_window">
+        <field name="name">Đơn hàng</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">simple.sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_simple_sale_order_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Tạo đơn hàng mới
+            </p>
+        </field>
+    </record>
+</odoo>
